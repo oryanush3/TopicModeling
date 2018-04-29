@@ -7,58 +7,85 @@ using Client.Model;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System;
+using System.Net;
+using System.Threading;
+using System.Linq;
+using System.Text;
 
-namespace Client.View
-{
-    public class MyTelnet : ITelnetClient
+namespace SimpleWebServer
     {
-        private Socket sock;
-
-        public void connect(string ip, int port)
+        public class WebServer
         {
+            private readonly HttpListener _listener = new HttpListener();
+            private readonly Func<HttpListenerRequest, string> _responderMethod;
 
-            IPEndPoint ipep = new IPEndPoint(IPAddress.Parse(ip), port);
-            sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try
+            public WebServer(string[] prefixes, Func<HttpListenerRequest, string> method)
             {
-                sock.Connect(ipep);
+                if (!HttpListener.IsSupported)
+                    throw new NotSupportedException(
+                        "Needs Windows XP SP2, Server 2003 or later.");
+
+                // URI prefixes are required, for example 
+                // "http://localhost:8080/index/".
+
+                if (prefixes == null || prefixes.Length == 0)
+                    throw new ArgumentException("prefixes");
+
+                // A responder method is required
+                if (method == null)
+                    throw new ArgumentException("method");
+
+                foreach (string s in prefixes)
+                    _listener.Prefixes.Add(s);
+
+                _responderMethod = method;
+                _listener.Start();
             }
-            catch (SocketException e)
+
+            public WebServer(Func<HttpListenerRequest, string> method, params string[] prefixes)
+                : this(prefixes, method)
+            { }
+
+            public void Run()
             {
-                Console.WriteLine("Unable to connect to server." + e.ToString());
-                return;
+                ThreadPool.QueueUserWorkItem((o) =>
+                {
+                    Console.WriteLine("Webserver running...");
+                    try
+                    {
+                        while (_listener.IsListening)
+                        {
+                            ThreadPool.QueueUserWorkItem((c) =>
+                            {
+                                var ctx = c as HttpListenerContext;
+                                try
+                                {
+                                    string rstr = _responderMethod(ctx.Request);
+                                    byte[] buf = Encoding.UTF8.GetBytes(rstr);
+                                    ctx.Response.ContentLength64 = buf.Length;
+                                    ctx.Response.OutputStream.Write(buf, 0, buf.Length);
+                                }
+                                catch { } // suppress any exceptions
+                                finally
+                                {
+                                    // always close the stream
+                                    ctx.Response.OutputStream.Close();
+                                }
+                            }, _listener.GetContext());
+                        }
+                    }
+                    catch { } // suppress any exceptions
+                });
             }
-        }
-        //disconnect from server
-        public void disconnect()
-        {
-            sock.Shutdown(SocketShutdown.Both);
-            sock.Close();
-        }
-        //send commands in another thread so the program can keep running
-        public void write(string command)
-        {
-            Thread send = new Thread(o => SendCommands(command));
-            send.Start();
-        }
-        public string read()
-        {
-            string data = "";
-            ReceiveOutputs(ref data);
-            return data;
+
+            public void Stop()
+            {
+                _listener.Stop();
+                _listener.Close();
+            }
         }
 
-        //receive data from server converting it to string
-        private void ReceiveOutputs(ref string input)
-        {
-            byte[] data = new byte[1024];
-            int recv = sock.Receive(data);
-            input = Encoding.ASCII.GetString(data, 0, recv);
-        }
-        //send commands to server
-        private void SendCommands(string data)
-        {
-            sock.Send(Encoding.ASCII.GetBytes(data));
-        }
     }
+}
 }
