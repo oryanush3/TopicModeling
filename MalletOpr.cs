@@ -105,7 +105,7 @@ namespace Server
                 float num = float.Parse(mData[i]);
                 if (num > 0.25)
                 {
-                    file.addTopic(i);
+                    file.addTopic(i-1);
                 }
 
             }

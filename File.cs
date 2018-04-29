@@ -8,8 +8,8 @@ namespace Server
 {
     public class File
     {
-        private string name;
-        private List<int> topics;
+        public string name { get; set; }
+        public List<int> topics { get; set; }
 
        public File(string name)
        {
@@ -21,10 +21,5 @@ namespace Server
        {
             topics.Add(id);
        }
-
-        public List<int> GetTopics()
-        {
-            return this.topics;
-        }
     }
 }

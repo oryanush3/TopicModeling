@@ -8,8 +8,8 @@ namespace Server
 {
     public class Topic
     {
-        private int id;
-        private List<string> keys;
+        public int id { get; set; }
+        public List<string> keys { get; set; }
 
         public Topic(int id)
         {
@@ -22,14 +22,5 @@ namespace Server
             this.keys.Add(key);
         }
 
-        public List<String> GetKeys()
-        {
-            return this.keys;
-        }
-
-        public int GetId()
-        {
-            return this.id;
-        }
     }
 }
