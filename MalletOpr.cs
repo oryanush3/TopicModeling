@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace Server
 {
     using System.IO;
-    using Topic = System.Collections.Generic.List<string>;
 
     public class MalletOpr
     {
@@ -51,19 +50,20 @@ namespace Server
             string path = this.ext.GetPath() + @"\" + this.outputFile;
             string[] lines = System.IO.File.ReadAllLines(path);
             List<Topic> topics = new List<Topic>();
-             
+            int i = 1; 
             foreach (string line in lines)
             {
-                Topic topic = new Topic();
+                Topic topic = new Topic(i);
                 string[] data = line.Split('\t');
                 string[] keys = data[2].Split(' ');
 
-                for (int i=0; i<keys.Length; i++)
+                for (int j=0; j<keys.Length; j++)
                 {
-                    topic.Add(keys[i]);
+                    topic.AddKey(keys[j]);
                 }
 
                 topics.Add(topic);
+                i++;
             }
             return topics;
         }

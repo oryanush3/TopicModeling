@@ -9,8 +9,6 @@ using System.Net.Sockets;
 
 namespace Server
 {
-    using Topic = System.Collections.Generic.List<string>;
-
     class Program
     {
 
@@ -85,7 +83,7 @@ namespace Server
 
         static void Main(string[] args)
         {
-            /*
+            
             // Establish the remote endpoint for the socket.  
             // This example uses port 11000 on the local computer.  
             IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
@@ -97,45 +95,48 @@ namespace Server
                 SocketType.Stream, ProtocolType.Tcp);
             sender.Connect(remoteEP);
 
-            //read requset from socket
-            byte[] msg = StartReadClient(sender);
-            string req = Encoding.ASCII.GetString(msg);
-            */
-            //initalized paramters - should be data from client
-            string malletPath = @"c:\mallet";
-            string dataPath = @"sample-data\web\news";
-            string resultMalletFile = "keys.mallet";
-            string resultTxtFile = "keys.txt";
-            string DataOfFile = "topics.txt";
+            while (true)
+            {
+                //read requset from socket
+                byte[] msg = StartReadClient(sender);
+                string req = Encoding.ASCII.GetString(msg);
 
-            int numTopics = 10;
-            List<string> flags = new List<string>();
-            flags.Add("keep-sequence");
-            flags.Add("remove-stopwords");
+                //initalized paramters - should be data from client
+                string malletPath = @"c:\mallet";
+                string dataPath = @"sample-data\web\news";
+                string resultMalletFile = "keys.mallet";
+                string resultTxtFile = "keys.txt";
+                string DataOfFile = "topics.txt";
+                int numTopics = 10;
+                List<string> flags = new List<string>();
+                flags.Add("keep-sequence");
+                flags.Add("remove-stopwords");
 
-            //begin
-            IExternal cmd = new CmdWindows(malletPath);
-            MalletOpr mallet = new MalletOpr(cmd);
+                //begin
+                IExternal cmd = new CmdWindows(malletPath);
+                MalletOpr mallet = new MalletOpr(cmd);
 
-            //run
-            mallet.CreateMalletFile(dataPath, resultMalletFile, flags);
-            mallet.RunTopics(numTopics, resultMalletFile, resultTxtFile, DataOfFile);
-            List<Topic> getTopics = mallet.getTopics();
-            List<File> files = mallet.getTopicsForFiles();
+                //run
+                mallet.CreateMalletFile(dataPath, resultMalletFile, flags);
+                mallet.RunTopics(numTopics, resultMalletFile, resultTxtFile, DataOfFile);
+                List<Topic> getTopics = mallet.getTopics();
+                List<File> files = mallet.getTopicsForFiles();
 
-            String jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(getTopics);
-            String jsonString2 = Newtonsoft.Json.JsonConvert.SerializeObject(files);
+                String jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(getTopics);
+                String jsonString2 = Newtonsoft.Json.JsonConvert.SerializeObject(files);
+                List<String> data = new List<string>();
+                data.Add(jsonString);
+                data.Add(jsonString2);
+                String jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(data);
 
-            /*
-            //write to socket
-            byte[] msg1 = Encoding.ASCII.GetBytes(jsonString);
-            byte[] msg2 = Encoding.ASCII.GetBytes(jsonString2);
-            int bytes = WriteToClient(msg1, sender);
+                //write to socket
+                byte[] msg1 = Encoding.ASCII.GetBytes(jsonData);
+                int bytes = WriteToClient(msg1, sender);
 
-            // Release the socket.  
-            //sender.Shutdown(SocketShutdown.Both);
-            //sender.Close();
-            */
+                // Release the socket.  
+                //sender.Shutdown(SocketShutdown.Both);
+                //sender.Close();
+            }
         }
     }
 }
