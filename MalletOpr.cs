@@ -57,7 +57,7 @@ namespace Server
                 string[] data = line.Split('\t');
                 string[] keys = data[2].Split(' ');
 
-                for (int j=0; j<keys.Length; j++)
+                for (int j=0; j<keys.Length-1; j++)
                 {
                     topic.AddKey(keys[j]);
                 }

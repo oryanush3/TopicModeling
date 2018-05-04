@@ -9,13 +9,13 @@ namespace Server
     public class Req
     {
         public string path { get; set; }
-        public int num { get; set; }
+        public int topics { get; set; }
         public List<string> flags { get; set; }
 
         public Req(string path, int num, List<string> flags)
         {
             this.path = path;
-            this.num = num;
+            this.topics = num;
             this.flags = flags;
         }
     }
