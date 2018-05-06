@@ -61,7 +61,7 @@ namespace Server
             //        {
 
             //read requset from socket
-            byte[] msg = new byte[1024];
+              byte[] msg = new byte[1024];
               int recv = sock2.Receive(msg);
               string input = Encoding.ASCII.GetString(msg, 0, recv);
               Console.Write("get : {0}", input);
