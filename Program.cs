@@ -93,18 +93,18 @@ namespace Server
 
                     //convert to Json
                     List<Topic> getTopics = mallet.getTopics();
-                //    List<File> files = mallet.getTopicsForFiles();
+                    List<File> files = mallet.getTopicsForFiles();
 
                     string jsonString = JsonConvert.SerializeObject(getTopics);
-            //        string jsonString2 = JsonConvert.SerializeObject(files);
+                    string jsonString2 = JsonConvert.SerializeObject(files);
 
 
                     byte[] msg1 = Encoding.ASCII.GetBytes(jsonString);
-              //      byte[] msg2 = Encoding.ASCII.GetBytes(jsonString2);
+                    byte[] msg2 = Encoding.ASCII.GetBytes(jsonString2);
 
-                //    int bytes = WriteToClient(msg1, sock2);
-              //      Console.Write("send msg1: {0}  length is : {1}", jsonString, bytes);
-                //    System.Threading.Thread.Sleep(10000);
+            //    int bytes = WriteToClient(msg1, sock2);
+            //      Console.Write("send msg1: {0}  length is : {1}", jsonString, bytes);
+            //    System.Threading.Thread.Sleep(10000);
 
             //}
             //  else
@@ -113,20 +113,30 @@ namespace Server
             //int recv2 = sock2.Receive(msg3);
             //int bytes2 = WriteToClient(msg2, sock2);
             //Console.Write("send msg2 : {0} length is :{1} ", jsonString2, bytes2);
-                //}
-                
-             //   List<String> data = new List<string>();
-             //   data.Add(jsonString);
-              //  data.Add(jsonString2);
-              //  String jsonData = JsonConvert.SerializeObject(data);
+            //}
+
+            //  List<String> data = new List<string>();
+            //  data.Add(jsonString);
+            // data.Add(jsonString2);
+            Res data = new Res(jsonString);
+            Res data2 = new Res(jsonString2);
+
+            String jsonData1 = JsonConvert.SerializeObject(data);
+            String jsonData2 = JsonConvert.SerializeObject(data2);
 
 
+            Res2 data3= new Res2(jsonData2,jsonData1);
+            String jsonData = JsonConvert.SerializeObject(data3);
 
-                //write to socket         
-                //byte[] msg5 = Encoding.ASCII.GetBytes(jsonData);
-                int bytes = WriteToClient(msg1, sock2);
-                Console.Write("send : {0}",jsonString);
-                Console.ReadKey();
+
+            //write to socket         
+            //     byte[] msg5 = Encoding.ASCII.GetBytes(jsonData);
+            byte[] msg6 = Encoding.ASCII.GetBytes(jsonData);
+            int bytes = WriteToClient(msg6, sock2);
+            int bytes2 = WriteToClient(null, sock2);
+
+            Console.Write("send : {0}",jsonData);
+            Console.ReadKey();
                 
 
 
